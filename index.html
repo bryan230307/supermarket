@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supermarket POS – Sistem Manajemen Inventori</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    color: #1e293b;
+    background: #f8fafc;
+  }
+
+  /* NAVBAR */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 12px rgba(0,0,0,0.08);
+    z-index: 100;
+  }
+
+  .nav-brand { font-size: 20px; font-weight: 700; color: #2563eb; display: flex; align-items: center; gap: 8px; }
+  .nav-links { display: flex; gap: 28px; }
+  .nav-links a { text-decoration: none; color: #64748b; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: #2563eb; }
+  .nav-btn {
+    background: #2563eb;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+  .nav-btn:hover { background: #1d4ed8; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 20px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    top: -200px; right: -200px;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    width: 400px; height: 400px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 50%;
+    bottom: -150px; left: -100px;
+  }
+
+  .hero-content { position: relative; z-index: 1; max-width: 700px; }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-size: 56px;
+    font-weight: 800;
+    color: white;
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 span { color: #93c5fd; }
+
+  .hero p {
+    font-size: 18px;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.6;
+    margin-bottom: 36px;
+  }
+
+  .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-white {
+    background: white;
+    color: #2563eb;
+    padding: 14px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  .btn-white:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+  .btn-outline {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.6);
+    padding: 14px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: white; }
+
+  /* STATS */
+  .stats {
+    background: white;
+    padding: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .stat-item { text-align: center; }
+  .stat-item .num { font-size: 36px; font-weight: 800; color: #2563eb; }
+  .stat-item .lbl { font-size: 13px; color: #64748b; margin-top: 4px; }
+
+  /* FEATURES */
+  .section { padding: 80px 40px; max-width: 1100px; margin: 0 auto; }
+  .section-title { text-align: center; margin-bottom: 50px; }
+  .section-title h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+  .section-title p { font-size: 16px; color: #64748b; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .feature-card {
+    background: white;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    transition: all 0.3s;
+    border: 1px solid #f1f5f9;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.1);
+    border-color: #dbeafe;
+  }
+
+  .feature-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    margin-bottom: 16px;
+  }
+
+  .bg-blue { background: #dbeafe; }
+  .bg-green { background: #dcfce7; }
+  .bg-orange { background: #fed7aa; }
+  .bg-purple { background: #ede9fe; }
+  .bg-red { background: #fee2e2; }
+  .bg-teal { background: #ccfbf1; }
+
+  .feature-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+  /* TECH STACK */
+  .tech-section {
+    background: #1e293b;
+    padding: 60px 40px;
+    text-align: center;
+  }
+
+  .tech-section h2 { color: white; font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+  .tech-section p { color: #94a3b8; margin-bottom: 36px; }
+
+  .tech-grid {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .tech-badge {
+    background: #334155;
+    color: #e2e8f0;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* SCREENSHOT MOCKUP */
+  .mockup-section {
+    background: linear-gradient(180deg, #f8fafc 0%, #eff6ff 100%);
+    padding: 80px 40px;
+    text-align: center;
+  }
+
+  .mockup-box {
+    max-width: 900px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(37,99,235,0.15);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .mockup-bar {
+    background: #1e293b;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mockup-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+  .dot-green { background: #22c55e; }
+
+  .mockup-url {
+    background: #334155;
+    flex: 1;
+    margin: 0 12px;
+    padding: 4px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #94a3b8;
+    text-align: left;
+  }
+
+  .mockup-content {
+    background: #f1f5f9;
+    padding: 30px;
+    min-height: 300px;
+    display: flex;
+    gap: 16px;
+  }
+
+  .mockup-sidebar {
+    width: 180px;
+    background: #1e293b;
+    border-radius: 10px;
+    padding: 16px;
+    flex-shrink: 0;
+  }
+
+  .mockup-sidebar-item {
+    height: 10px;
+    background: #334155;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  .mockup-sidebar-item.active { background: #3b82f6; }
+
+  .mockup-main { flex: 1; }
+
+  .mockup-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .mockup-card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .mockup-card .mc-label { height: 6px; background: #e2e8f0; border-radius: 3px; margin-bottom: 8px; width: 60%; }
+  .mockup-card .mc-value { height: 14px; border-radius: 3px; }
+  .mc-blue { background: #bfdbfe; }
+  .mc-green { background: #bbf7d0; }
+  .mc-orange { background: #fed7aa; }
+  .mc-purple { background: #ddd6fe; }
+
+  .mockup-table {
+    background: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+
+  .mockup-row {
+    height: 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+
+  .mockup-row:first-child { background: #dbeafe; }
+
+  /* CTA */
+  .cta-section {
+    padding: 80px 40px;
+    text-align: center;
+    background: white;
+  }
+
+  .cta-section h2 { font-size: 36px; font-weight: 800; margin-bottom: 12px; }
+  .cta-section p { font-size: 16px; color: #64748b; margin-bottom: 32px; }
+
+  /* FOOTER */
+  footer {
+    background: #0f172a;
+    color: #64748b;
+    text-align: center;
+    padding: 28px 40px;
+    font-size: 13px;
+  }
+
+  footer span { color: #3b82f6; }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 36px; }
+    nav { padding: 14px 20px; }
+    .nav-links { display: none; }
+    .stats { gap: 30px; padding: 30px 20px; }
+    .section { padding: 50px 20px; }
+    .mockup-cards { grid-template-columns: repeat(2, 1fr); }
+    .mockup-sidebar { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-brand">🛒 Supermarket POS</div>
+  <div class="nav-links">
+    <a href="#fitur">Fitur</a>
+    <a href="#teknologi">Teknologi</a>
+    <a href="#tentang">Tentang</a>
+  </div>
+  <a href="https://github.com/username/supermarket" class="nav-btn" target="_blank">⭐ GitHub</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">🚀 Sistem Manajemen Inventori Modern</div>
+    <h1>Supermarket <span>POS</span> System</h1>
+    <p>Solusi lengkap untuk manajemen inventori supermarket. Kelola barang, transaksi, laporan, dan pengguna dalam satu sistem yang mudah digunakan.</p>
+    <div class="hero-btns">
+      <a href="https://github.com/username/supermarket" class="btn-white" target="_blank">📥 Download Gratis</a>
+      <a href="#fitur" class="btn-outline">✨ Lihat Fitur</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-item">
+    <div class="num">6+</div>
+    <div class="lbl">Fitur Utama</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">4</div>
+    <div class="lbl">Tabel Database</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">2</div>
+    <div class="lbl">Role Pengguna</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">100%</div>
+    <div class="lbl">Gratis & Open Source</div>
+  </div>
+</div>
+
+<!-- MOCKUP -->
+<div class="mockup-section">
+  <div class="section-title">
+    <h2>Tampilan Sistem</h2>
+    <p>Interface yang bersih, modern, dan mudah digunakan</p>
+  </div>
+  <div class="mockup-box">
+    <div class="mockup-bar">
+      <div class="mockup-dot dot-red"></div>
+      <div class="mockup-dot dot-yellow"></div>
+      <div class="mockup-dot dot-green"></div>
+      <div class="mockup-url">localhost/supermarket/pages/dashboard.php</div>
+    </div>
+    <div class="mockup-content">
+      <div class="mockup-sidebar">
+        <div style="height:14px;background:#3b82f6;border-radius:6px;margin-bottom:20px;"></div>
+        <div class="mockup-sidebar-item active"></div>
+        <div class="mockup-sidebar-item"></div>
+        <div class="mockup-sidebar-item"></div>
+        <div style="height:6px;background:#475569;border-radius:3px;margin:16px 0 8px;width:50%;"></div>
+        <div class="mockup-sidebar-item"></div>
+        <div class="mockup-sidebar-item"></div>
+        <div style="height:6px;background:#475569;border-radius:3px;margin:16px 0 8px;width:50%;"></div>
+        <div class="mockup-sidebar-item"></div>
+      </div>
+      <div class="mockup-main">
+        <div class="mockup-cards">
+          <div class="mockup-card"><div class="mc-label"></div><div class="mc-value mc-blue"></div></div>
+          <div class="mockup-card"><div class="mc-label"></div><div class="mc-value mc-green"></div></div>
+          <div class="mockup-card"><div class="mc-label"></div><div class="mc-value mc-orange"></div></div>
+          <div class="mockup-card"><div class="mc-label"></div><div class="mc-value mc-purple"></div></div>
+        </div>
+        <div class="mockup-table">
+          <div class="mockup-row"></div>
+          <div class="mockup-row"></div>
+          <div class="mockup-row"></div>
+          <div class="mockup-row"></div>
+          <div class="mockup-row"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FITUR -->
+<section id="fitur">
+  <div class="section">
+    <div class="section-title">
+      <h2>Fitur Lengkap</h2>
+      <p>Semua yang kamu butuhkan untuk mengelola supermarket</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon bg-blue">📦</div>
+        <h3>CRUD Lengkap</h3>
+        <p>Kelola data barang, kategori, transaksi, dan pengguna dengan operasi Create, Read, Update, Delete yang mudah.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-green">🔗</div>
+        <h3>Relasi Database (JOIN)</h3>
+        <p>Query menggunakan JOIN antar tabel barang, kategori, dan transaksi untuk tampilan data yang lengkap dan akurat.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-orange">📋</div>
+        <h3>Laporan & Report</h3>
+        <p>Laporan transaksi per periode, rekap bulanan, top barang terjual, dan fitur cetak langsung dari browser.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-purple">🔍</div>
+        <h3>Search & Filter</h3>
+        <p>Pencarian real-time di semua halaman — barang, transaksi, kategori, hingga pengguna dengan filter fleksibel.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-red">🔐</div>
+        <h3>Login & Registrasi</h3>
+        <p>Sistem autentikasi lengkap dengan session, hashing password bcrypt, registrasi akun baru, dan logout aman.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon bg-teal">🏗️</div>
+        <h3>OOP PHP</h3>
+        <p>Kode terstruktur menggunakan konsep Object-Oriented Programming dengan class Database, Auth, Barang, Transaksi, dan User.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEKNOLOGI -->
+<section id="teknologi" class="tech-section">
+  <h2>🛠️ Teknologi yang Digunakan</h2>
+  <p>Dibangun dengan teknologi web yang stabil dan mudah dipelajari</p>
+  <div class="tech-grid">
+    <div class="tech-badge">🐘 PHP 8.x</div>
+    <div class="tech-badge">🗄️ MySQL / MariaDB</div>
+    <div class="tech-badge">🔌 PDO</div>
+    <div class="tech-badge">🎨 CSS3</div>
+    <div class="tech-badge">⚡ JavaScript</div>
+    <div class="tech-badge">🏗️ OOP</div>
+    <div class="tech-badge">🖥️ XAMPP</div>
+    <div class="tech-badge">🔒 Bcrypt</div>
+  </div>
+</section>
+
+<!-- TENTANG -->
+<section id="tentang">
+  <div class="section">
+    <div class="section-title">
+      <h2>Cara Install</h2>
+      <p>Siap dijalankan dalam beberapa langkah mudah</p>
+    </div>
+    <div class="features-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+      <div class="feature-card" style="text-align:center;">
+        <div class="feature-icon bg-blue" style="margin:0 auto 16px;">1️⃣</div>
+        <h3>Download</h3>
+        <p>Clone atau download repository dari GitHub ke komputer kamu.</p>
+      </div>
+      <div class="feature-card" style="text-align:center;">
+        <div class="feature-icon bg-green" style="margin:0 auto 16px;">2️⃣</div>
+        <h3>Import Database</h3>
+        <p>Import file <code>supermarket.sql</code> ke phpMyAdmin atau MySQL.</p>
+      </div>
+      <div class="feature-card" style="text-align:center;">
+        <div class="feature-icon bg-orange" style="margin:0 auto 16px;">3️⃣</div>
+        <h3>Konfigurasi</h3>
+        <p>Sesuaikan koneksi database di file <code>config/database.php</code>.</p>
+      </div>
+      <div class="feature-card" style="text-align:center;">
+        <div class="feature-icon bg-purple" style="margin:0 auto 16px;">4️⃣</div>
+        <h3>Jalankan</h3>
+        <p>Buka browser dan akses <code>localhost/supermarket</code>. Selesai!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-section">
+  <h2>Siap Mencoba? 🚀</h2>
+  <p>Download gratis dan mulai kelola inventori supermarket kamu sekarang</p>
+  <a href="https://github.com/username/supermarket" class="btn-white"
+    style="background:#2563eb;color:white;padding:14px 36px;border-radius:10px;text-decoration:none;font-size:16px;font-weight:700;display:inline-block;transition:all 0.2s;"
+    target="_blank">
+    📥 Download di GitHub
+  </a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <span>Supermarket POS</span> — Dibuat dengan ❤️ menggunakan PHP & MySQL</p>
+  <p style="margin-top:6px;">Gratis untuk digunakan dan dikembangkan</p>
+</footer>
+
+</body>
+</html>
